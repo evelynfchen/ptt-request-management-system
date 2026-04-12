@@ -1,43 +1,68 @@
-SE_Teamwork
+# Part-Time Teaching Request Management System
 
-Data File Format
+## Project Overview
+This project is a Java backend system for managing part-time teaching requests. It was developed as part of a six-member team project, focusing on system design, object-oriented programming, and collaborative software development.
 
-Path
-`data/data.txt`
+The system allows users to create teaching requests, match candidates based on skills, record training information, and persist data using a file-based storage mechanism.
 
-Structure
-```text
-[COURSES]
-courseCode|budget
+---
 
-[PTT_MEMBERS]
-guid|name|skills|available
+## My Contributions
+- Took a leading role in coordinating system integration and ensuring consistency across components  
+- Designed and implemented core entity-layer classes, including:
+  - `TeachingRequest`
+  - `PTTMember`
+  - `TrainingRecord`
+- Contributed to testing, debugging, and final system demonstration  
+- Ensured alignment between UML design and implementation  
 
-[REQUESTS]
-courseCode|requiredSkills|status|matchedMember
-```
+---
 
-Examples
-```text
-[COURSES]
-CS101|1000
-CS102|1200
+## System Design Highlights
+- **Layered Architecture**
+  - Entity layer: data models (e.g., TeachingRequest, PTTMember)
+  - Service layer: business logic (e.g., MatchingEngine, RequestManager)
+  - Persistence layer: data storage (SimpleDatabase)
 
-[PTT_MEMBERS]
-M001|Alice|Java,SQL|true
-M002|Bob|Python|false
+- **Design Patterns**
+  - Strategy Pattern: flexible skill-based matching logic  
+  - Singleton Pattern: shared access to persistence component  
 
-[REQUESTS]
-CS101|Java|MATCHED|M001
-CS102|Python|PENDING|
-```
+- **Data Persistence**
+  - File-based storage using a custom SimpleDatabase class  
+  - Load/save functionality for application state  
 
-Rules
-- Sections are identified by the header lines in brackets.
-- Fields are separated by `|`.
-- Skills are comma-separated within the skills field.
-- Empty lines are allowed.
-- Lines with the wrong number of fields are ignored during load.
-- `available` must be `true` or `false`.
-- `status` must be `PENDING` or `MATCHED`.
-- `matchedMember` may be empty.
+- **Engineering Considerations**
+  - Separation of concerns for maintainability  
+  - Consideration of scalability limitations of file-based persistence  
+
+---
+
+## How to Run
+1. Open the project in IntelliJ IDEA  
+2. Navigate to `Main.java`  
+3. Run the program  
+4. Use the command-line interface to:
+   - Create requests  
+   - Match candidates  
+   - Record training  
+   - Save/load data  
+
+---
+
+## Technologies Used
+- Java  
+- Object-Oriented Programming (OOP)  
+- UML (Class & Sequence Diagrams)  
+- Git (team collaboration)  
+
+---
+
+## Screenshots
+*(Add screenshots here if available, e.g. CLI interaction or system output)*
+
+---
+
+## Notes
+This repository is a portfolio-focused version of a team project.  
+It has been adapted to highlight my contributions and key system design aspects.

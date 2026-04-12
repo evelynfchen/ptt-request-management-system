@@ -54,12 +54,22 @@ The system allows users to create teaching requests, match candidates based on s
 - Java  
 - Object-Oriented Programming (OOP)  
 - UML (Class & Sequence Diagrams)  
-- Git (team collaboration)  
+- Git (team collaboration)
 
 ---
 
 ## Screenshots
-*(Add screenshots here if available, e.g. CLI interaction or system output)*
+
+These screenshots demonstrate the key functionalities of the system, including request creation, candidate matching, and system output.
+
+### System Start
+![System Start](screenshots/figure1_system_start.png)
+
+### Matching Process
+![Matching Process](screenshots/figure3_matching.png)
+
+### System Output
+![System Output](screenshots/running_output.png)
 
 ---
 

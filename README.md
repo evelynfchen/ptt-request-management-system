@@ -1,78 +1,108 @@
-# Part-Time Teaching Request Management System
+# Part-Time Teaching (PTT) Request Management System
 
-## Project Overview
-This project is a Java backend system for managing part-time teaching requests. It was developed as part of a six-member team project, focusing on system design, object-oriented programming, and collaborative software development.
+A command-line Java application for managing part-time teaching requests: creating requests with required skills, matching them against available staff, recording training, and persisting data to a flat file.
 
-The system allows users to create teaching requests, match candidates based on skills, record training information, and persist data using a file-based storage mechanism.
+This was a **six-person team project** (University of Glasgow, MSc Software Development). This repository is my personal portfolio copy of the team's submitted application — the full codebase is included so it still runs end-to-end, but the sections below describe specifically **what I personally built**, not the team's work as a whole. For the detailed authorship evidence (git blame/log breakdowns, line counts, commit references), see [CONTRIBUTIONS.md](CONTRIBUTIONS.md).
 
----
+## What I built
 
-## My Contributions
-- Took a leading role in coordinating system integration and ensuring consistency across components  
-- Designed and implemented core entity-layer classes, including:
-  - `TeachingRequest`
-  - `PTTMember`
-  - `TrainingRecord`
-- Contributed to testing, debugging, and final system demonstration  
-- Ensured alignment between UML design and implementation  
+- **Domain modelling and encapsulation** — I designed and implemented the core entity classes from scratch: [`PTTMember`](src/entity/PTTMember.java), [`TeachingRequest`](src/entity/TeachingRequest.java), [`TrainingRecord`](src/entity/TrainingRecord.java), [`RequestStatus`](src/entity/RequestStatus.java), [`Course`](src/entity/Course.java), [`User`](src/entity/User.java), [`Administrator`](src/entity/Administrator.java), and [`CourseDirector`](src/entity/CourseDirector.java). All fields are private, exposed only through getters/setters and purpose-built methods.
+- **Entity-level validation and invariants** — `PTTMember` and `TeachingRequest` guard their own state: `addSkill()` and `addMatchedCandidate()` both reject duplicates, and `addMatchedCandidate()` automatically transitions the request's status to `MATCHED` the moment a candidate is added, so calling code can't add a match and forget to update status.
+- **Reusable skill-validation logic** — `PTTMember.hasAllSkills()` is the method a teammate's matching algorithm ([`SkillMatchingStrategy`](src/service/SkillMatchingStrategy.java)) calls to check whether a staff member covers a request's required skills. I implemented the validation method itself; the surrounding Strategy-pattern matching algorithm that calls it was written by a teammate.
+- **Defensive copying of incoming data** — constructors and setters in `PTTMember` and `TeachingRequest` copy any `List` passed in (`new ArrayList<>(skills)`, etc.) rather than storing the caller's reference directly, so the entity isn't left holding a list the caller can still mutate from outside. This protection is scoped to constructor/setter inputs — see the note in CONTRIBUTIONS.md on what it does and doesn't cover.
+- **CLI integration** — I extended the command-line flow in [`Main.java`](src/Main.java) (budget input with validation/fallback, wiring the auto-status-update into the "match candidates" menu option, minor fixes), on top of the menu-driven CLI structure a teammate built.
+- **Unit-level testing** — [`EntityTest.java`](src/EntityTest.java) is a manual test harness I wrote that exercises the entity layer directly: creating a request, matching a candidate by skill, confirming the status transition, and recording training.
 
----
+## What I did not build
 
-## System Design Highlights
-- **Layered Architecture**
-  - Entity layer: data models (e.g., TeachingRequest, PTTMember)
-  - Service layer: business logic (e.g., MatchingEngine, RequestManager)
-  - Persistence layer: data storage (SimpleDatabase)
+To keep attribution accurate: the persistence layer ([`SimpleDatabase`](src/persistence/SimpleDatabase.java)), the Strategy Pattern interface and matching algorithm itself ([`MatchingStrategy`](src/service/MatchingStrategy.java), [`MatchingEngine`](src/service/MatchingEngine.java), [`SkillMatchingStrategy`](src/service/SkillMatchingStrategy.java)), [`RequestManager`](src/service/RequestManager.java), [`TrainingManager`](src/service/TrainingManager.java), and the overall CLI menu structure in `Main.java` were primarily built by teammates. Full attribution is in [CONTRIBUTIONS.md](CONTRIBUTIONS.md).
 
-- **Design Patterns**
-  - Strategy Pattern: flexible skill-based matching logic  
-  - Singleton Pattern: shared access to persistence component  
+## System design (whole application)
 
-- **Data Persistence**
-  - File-based storage using a custom SimpleDatabase class  
-  - Load/save functionality for application state  
+The points below describe the team's overall system, not just my contribution:
 
-- **Engineering Considerations**
-  - Separation of concerns for maintainability  
-  - Consideration of scalability limitations of file-based persistence  
+- **Layered architecture**
+  - Entity layer: domain models (`TeachingRequest`, `PTTMember`, etc.)
+  - Service layer: business logic (`MatchingEngine`, `RequestManager`, `TrainingManager`)
+  - Persistence layer: file-based data storage (`SimpleDatabase`)
+- **Design patterns**
+  - Strategy Pattern: pluggable skill-based matching logic (`MatchingStrategy` / `SkillMatchingStrategy`)
+  - Singleton Pattern: shared access to the persistence component (`SimpleDatabase.getInstance()`)
+- **Data persistence**
+  - File-based storage via `SimpleDatabase`, with load/save of application state to `data/data.txt`
 
----
+## Technologies
 
-## How to Run
-1. Open the project in IntelliJ IDEA  
-2. Navigate to `Main.java`  
-3. Run the program  
-4. Use the command-line interface to:
-   - Create requests  
-   - Match candidates  
-   - Record training  
-   - Save/load data  
+Java, Object-Oriented Programming, UML (class & sequence diagrams, see `UML/`), Git/GitHub (team collaboration).
 
----
+## Running the application
 
-## Technologies Used
-- Java  
-- Object-Oriented Programming (OOP)  
-- UML (Class & Sequence Diagrams)  
-- Git (team collaboration)
+Requires a JDK (11+).
 
----
+```bash
+# compile
+javac -d out $(find src -name "*.java")
+
+# run the interactive CLI (from the project root, so it can find data/data.txt)
+java -cp out Main
+
+# or run the standalone entity test harness
+java -cp out EntityTest
+```
+
+Alternatively, open the project in IntelliJ IDEA and run `Main` directly.
+
+From the CLI you can create requests, match candidates, record training, and save/load data.
 
 ## Screenshots
 
-These screenshots demonstrate the key functionalities of the system, including request creation, candidate matching, and system output.
+These screenshots demonstrate the key functionality of the system, including request creation, candidate matching, and system output.
 
-### System Start
+### System start
 ![System Start](screenshots/figure1_system_start.png)
 
-### Matching Process
+### Matching process
 ![Matching Process](screenshots/figure3_matching.png)
 
-### System Output
+### System output
 ![System Output](screenshots/running_output.png)
 
----
+## Data file format
 
-## Notes
-This repository is a portfolio-focused version of a team project.  
-It has been adapted to highlight my contributions and key system design aspects.
+Path: `data/data.txt`
+
+```text
+[COURSES]
+courseCode|budget
+
+[PTT_MEMBERS]
+guid|name|skills|available
+
+[REQUESTS]
+courseCode|requiredSkills|status|matchedMember
+```
+
+Example:
+```text
+[COURSES]
+CS101|1000
+CS102|1200
+
+[PTT_MEMBERS]
+M001|Alice|Java,SQL|true
+M002|Bob|Python|false
+
+[REQUESTS]
+CS101|Java|MATCHED|M001
+CS102|Python|PENDING|
+```
+
+Rules:
+- Sections are identified by the header lines in brackets.
+- Fields are separated by `|`.
+- Skills are comma-separated within the skills field.
+- Empty lines are allowed.
+- Lines with the wrong number of fields are ignored during load.
+- `available` must be `true` or `false`.
+- `status` must be `PENDING` or `MATCHED`.
+- `matchedMember` may be empty.
